@@ -16,7 +16,7 @@ public class ExceptionAdvice {
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ErrorResponse handleNotFound(HttpClientErrorException.NotFound ex) {
+    public ErrorResponse handleNotFound() {
         return ErrorResponse.of(GlobalErrorCode.NOT_FOUND);
     }
 
