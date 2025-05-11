@@ -13,6 +13,12 @@ public record ErrorResponse(
         String code,
         String msg
 ) implements ApiResponse {
+    /**
+     * 실패 응답
+     *
+     * @param errorCode ErrorCode Enum
+     * @return ErrorResponse 인스턴스
+     */
     public static ErrorResponse of(@NonNull ErrorCode errorCode) {
         return new ErrorResponse(errorCode.getHttpStatus(), false, errorCode.getCode(), errorCode.getMessage());
     }
