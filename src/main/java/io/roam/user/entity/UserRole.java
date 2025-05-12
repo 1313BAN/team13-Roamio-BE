@@ -1,4 +1,4 @@
-package io.roam.user.domain;
+package io.roam.user.entity;
 
 import org.springframework.security.core.GrantedAuthority;
 

@@ -1,4 +1,4 @@
-package io.roam.user.domain;
+package io.roam.user.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

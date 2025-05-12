@@ -3,7 +3,6 @@ server:
     port: ${SERVER_PORT}
 
 spring:
-
     application:
         name: roamio
 
@@ -37,3 +36,9 @@ spring:
                 highlight_sql: true
         open-in-view: false
         database: mysql
+
+app:
+    jwt:
+        secret: ${JWT_SECRET}
+        access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+        refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
