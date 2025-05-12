@@ -31,6 +31,9 @@ dependencies {
 	
 	// ===== DEVTOOLS =====
 	compileOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// ===== SWAGGER =====
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
 	
 	// ===== MYSQL =====
 	runtimeOnly 'com.mysql:mysql-connector-j'
