@@ -16,16 +16,16 @@ import static org.springframework.web.servlet.function.ServerResponse.status;
 
 @Slf4j
 @RestControllerAdvice
-public class ApiResponseAdvice implements ResponseBodyAdvice<ApiResponse> {
+public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
         return ApiResponse.class.isAssignableFrom(returnType.getParameterType());
     }
 
     @Override
-    public ApiResponse beforeBodyWrite(ApiResponse body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+    public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         log.info("beforeBodyWrite: {}", body);
-        response.setStatusCode(body.status());
+        response.setStatusCode(((ApiResponse<?>) body).status());
         return body;
     }
 }

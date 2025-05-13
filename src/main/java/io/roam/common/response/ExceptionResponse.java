@@ -8,7 +8,7 @@ import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 
 @Builder
-public record ErrorResponse(
+public record ExceptionResponse(
         @JsonIgnore
         HttpStatus status,
         boolean success,
@@ -21,7 +21,7 @@ public record ErrorResponse(
      * @param errorCode ErrorCode Enum
      * @return ErrorResponse 인스턴스
      */
-    public static ErrorResponse of(@NonNull ErrorCode errorCode) {
-        return new ErrorResponse(errorCode.getHttpStatus(), false, errorCode.getCode(), errorCode.getMessage());
+    public static ExceptionResponse of(@NonNull ErrorCode errorCode) {
+        return new ExceptionResponse(errorCode.getHttpStatus(), false, errorCode.getCode(), errorCode.getMessage());
     }
 }

@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.roam.common.response.ErrorResponse;
+import io.roam.common.response.ExceptionResponse;
 import io.roam.jwt.JwtAuthenticationFilter;
 import io.roam.jwt.exception.JwtErrorCode;
 import jakarta.servlet.http.HttpServletResponse;
@@ -75,8 +75,8 @@ public class SecurityConfig {
         response.setStatus(errorCode.getHttpStatus().value());
         response.setCharacterEncoding("UTF-8");
         
-        ErrorResponse errorResponse = ErrorResponse.of(errorCode);
-        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+        ExceptionResponse exceptionResponse = ExceptionResponse.of(errorCode);
+        response.getWriter().write(objectMapper.writeValueAsString(exceptionResponse));
     }
 
     @Bean

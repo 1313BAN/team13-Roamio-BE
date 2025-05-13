@@ -3,8 +3,7 @@ package io.roam.common.controller;
 import io.roam.common.exception.ErrorCode;
 import io.roam.common.exception.GlobalErrorCode;
 import io.roam.common.exception.TestException;
-import io.roam.common.response.ApiResponse;
-import io.roam.common.response.ErrorResponse;
+import io.roam.common.response.ExceptionResponse;
 import io.roam.common.response.SuccessResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -82,7 +80,7 @@ class HealthControllerIntegrationTest {
         };
         
         // controller가 OK가 아닌 ErrorResponse를 반환하도록 설정
-        doReturn(ErrorResponse.of(nullStatusErrorCode)).when(healthController).ok();
+        doReturn(ExceptionResponse.of(nullStatusErrorCode)).when(healthController).ok();
 
         // when & then
         mockMvc.perform(get("/health/ok"))

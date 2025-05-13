@@ -25,13 +25,13 @@ public class AuthController implements AuthApi {
 
     @Override
     @PostMapping("/signin")
-    public ApiResponse<JwtToken> signIn(SignInRequest request) {
+    public ApiResponse<JwtToken> signIn(@Valid SignInRequest request) {
         return SuccessResponse.of(authService.signIn(request));
     }
 
     @Override
     @PostMapping("/signup")
-    public ApiResponse<SignUpResponse> signUp(@Valid @RequestBody SignUpRequest request) {
+    public ApiResponse<SignUpResponse> signUp(@Valid SignUpRequest request) {
         return SuccessResponse.of(authService.signUp(request));
     }
 }

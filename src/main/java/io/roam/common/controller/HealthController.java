@@ -13,7 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class HealthController {
 
     @GetMapping("/ok")
-    public ApiResponse ok() {
+    public ApiResponse<String> ok() {
         return SuccessResponse.of(HttpStatus.OK, "ok!!");
+    }
+
+    @GetMapping("/test")
+    public String test() {
+        return "test";
     }
 }
