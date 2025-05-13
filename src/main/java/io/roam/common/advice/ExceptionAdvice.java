@@ -33,7 +33,6 @@ public class ExceptionAdvice {
         });
         return ExceptionResponse.builder()
             .status(HttpStatus.BAD_REQUEST)
-            .success(false)
             .code(GlobalErrorCode.VALIDATION_FAILED.getCode())
             .msg(fieldErrors)
             .build();

@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class SuccessResponseTest {
+class ApiResponseTest {
 
     @Test
     @DisplayName("SuccessResponse 생성 테스트")
@@ -17,12 +17,12 @@ class SuccessResponseTest {
         HttpStatus status = HttpStatus.OK;
 
         // when
-        SuccessResponse<String> response = SuccessResponse.of(status, data);
+        ApiResponse<String> response = ApiResponse.of(status, data);
 
         // then
-        assertThat(response.status()).isEqualTo(status);
-        assertThat(response.success()).isTrue();
-        assertThat(response.data()).isEqualTo(data);
+        assertThat(response.getStatus()).isEqualTo(status);
+        assertThat(response.isSuccess()).isTrue();
+        assertThat(response.getData()).isEqualTo(data);
     }
 
     @Test
@@ -32,12 +32,12 @@ class SuccessResponseTest {
         HttpStatus status = HttpStatus.OK;
 
         // when
-        SuccessResponse<Object> response = SuccessResponse.of(status, null);
+        ApiResponse<Object> response = ApiResponse.of(status, null);
 
         // then
-        assertThat(response.status()).isEqualTo(status);
-        assertThat(response.success()).isTrue();
-        assertThat(response.data()).isNull();
+        assertThat(response.getStatus()).isEqualTo(status);
+        assertThat(response.isSuccess()).isTrue();
+        assertThat(response.getData()).isNull();
     }
     
     @Test
@@ -48,7 +48,7 @@ class SuccessResponseTest {
         String data = "test data";
 
         // when & then
-        assertThatThrownBy(() -> SuccessResponse.of(status, data))
+        assertThatThrownBy(() -> ApiResponse.of(status, data))
                 .isInstanceOf(NullPointerException.class);
     }
 } 

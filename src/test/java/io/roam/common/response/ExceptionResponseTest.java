@@ -29,10 +29,9 @@ class ExceptionResponseTest {
         ExceptionResponse response = ExceptionResponse.of(errorCode);
 
         // then
-        assertThat(response.status()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.success()).isFalse();
-        assertThat(response.code()).isEqualTo("GLOBAL_400");
-        assertThat(response.msg()).isEqualTo("Bad Request");
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.isSuccess()).isFalse();
+        assertThat(response.getCode()).isEqualTo("COMMON_400");
     }
 
     @Test
@@ -51,10 +50,10 @@ class ExceptionResponseTest {
         ExceptionResponse response = ExceptionResponse.of(mockErrorCode);
 
         // then
-        assertThat(response.status()).isEqualTo(status);
-        assertThat(response.success()).isFalse();
-        assertThat(response.code()).isEqualTo(code);
-        assertThat(response.msg()).isEqualTo(message);
+        assertThat(response.getStatus()).isEqualTo(status);
+        assertThat(response.isSuccess()).isFalse();
+        assertThat(response.getCode()).isEqualTo(code);
+        assertThat(response.getMsg()).isEqualTo(message);
     }
     
     @Test

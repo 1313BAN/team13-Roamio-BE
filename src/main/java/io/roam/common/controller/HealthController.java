@@ -1,8 +1,7 @@
 package io.roam.common.controller;
 
-import io.roam.common.exception.TestException;
+import io.roam.common.response.BaseResponse;
 import io.roam.common.response.ApiResponse;
-import io.roam.common.response.SuccessResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +13,7 @@ public class HealthController {
 
     @GetMapping("/ok")
     public ApiResponse<String> ok() {
-        return SuccessResponse.of(HttpStatus.OK, "ok!!");
+        return ApiResponse.of(HttpStatus.OK, "ok!!");
     }
 
     @GetMapping("/test")
