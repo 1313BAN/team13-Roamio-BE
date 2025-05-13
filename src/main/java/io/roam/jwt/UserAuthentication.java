@@ -1,4 +1,4 @@
-package io.roam.common.jwt;
+package io.roam.jwt;
 
 import java.util.Collection;
 import java.util.List;

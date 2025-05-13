@@ -1,6 +1,5 @@
 package io.roam.common.config;
 
-import io.roam.common.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +10,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import io.roam.jwt.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -36,6 +37,10 @@ public class SecurityConfig {
                         // swagger
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/**").permitAll()
+
+                        // health check
+                        .requestMatchers("/health/**").permitAll()
+
                         // 인증
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()

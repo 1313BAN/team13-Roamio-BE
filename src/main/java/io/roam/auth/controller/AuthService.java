@@ -1,8 +1,7 @@
-package io.roam.user.service;
+package io.roam.auth.controller;
 
 import org.springframework.stereotype.Service;
 
-import io.roam.common.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 
 @Service

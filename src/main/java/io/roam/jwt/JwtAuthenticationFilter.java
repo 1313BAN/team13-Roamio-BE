@@ -1,4 +1,4 @@
-package io.roam.common.jwt;
+package io.roam.jwt;
 
 import java.io.IOException;
 
@@ -26,17 +26,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
                                     throws ServletException, IOException {
-        String accessToken = jwtTokenProvider.resolveToken(request);
-
-        if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
-            Claims claims = jwtTokenProvider.getClaims(accessToken);
-            String email = claims.get("email", String.class);
-            String role = claims.get("role", String.class);
-            
-            Authentication authentication = UserAuthentication.of(email, UserRole.valueOf(role));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
-
+        String token = jwtTokenProvider.resolveToken(request);
+        authenticateUserIfValidToken(token);
         filterChain.doFilter(request, response);
+    }
+    
+    /**
+     * 유효한 토큰인 경우 사용자를 인증합니다.
+     */
+    private void authenticateUserIfValidToken(String token) {
+        if (token == null) {
+            return;
+        }
+        
+        Claims claims = jwtTokenProvider.getClaims(token);
+        if (claims != null) {
+            String email = jwtTokenProvider.getEmail(claims);
+            String role = jwtTokenProvider.getRole(claims);
+            
+            if (email != null && role != null) {
+                Authentication authentication = UserAuthentication.of(email, UserRole.valueOf(role));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        }
     }
 }

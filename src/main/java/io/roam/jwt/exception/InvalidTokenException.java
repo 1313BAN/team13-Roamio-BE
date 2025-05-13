@@ -1,4 +1,4 @@
-package io.roam.common.jwt.exception;
+package io.roam.jwt.exception;
 
 import io.roam.common.exception.DomainException;
 import io.roam.common.exception.GlobalErrorCode;
