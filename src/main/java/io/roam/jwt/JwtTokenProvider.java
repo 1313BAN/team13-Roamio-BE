@@ -101,14 +101,7 @@ public class JwtTokenProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        } catch (ExpiredJwtException e) {
-            log.debug("만료된 JWT 토큰입니다.");
-            return null;
-        } catch (JwtException e) {
-            log.debug("유효하지 않은 JWT 토큰입니다: {}", e.getMessage());
-            return null;
         } catch (Exception e) {
-            log.error("JWT 토큰 처리 중 오류가 발생했습니다: {}", e.getMessage());
             return null;
         }
     }

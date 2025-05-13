@@ -5,7 +5,6 @@ import io.roam.common.exception.GlobalErrorCode;
 import io.roam.common.response.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 @RestControllerAdvice
