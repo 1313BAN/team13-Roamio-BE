@@ -11,7 +11,7 @@ public record SuccessResponse<T>(
         HttpStatus status,
         boolean success,
         @Nullable T data
-) implements ApiResponse {
+) implements ApiResponse<T> {
     /**
      * 성공 응답 (200 OK)
      *

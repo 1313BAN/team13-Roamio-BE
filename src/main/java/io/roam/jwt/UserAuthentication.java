@@ -10,8 +10,12 @@ import io.roam.user.entity.UserRole;
 
 public class UserAuthentication extends UsernamePasswordAuthenticationToken {
 
-    public UserAuthentication(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
+    private UserAuthentication(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
         super(principal, credentials, authorities);
+    }
+
+    public static UserAuthentication of(Object principal, Object credentials, UserRole role) {
+        return new UserAuthentication(principal, credentials, List.of(role));
     }
 
     public static UserAuthentication of(Object principal, UserRole role) {

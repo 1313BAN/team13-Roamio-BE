@@ -3,20 +3,14 @@ package io.roam.jwt;
 import java.util.Date;
 import java.util.Map;
 
-import org.springframework.security.core.Authentication;
-
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.roam.common.config.JwtConfig;
 import io.roam.jwt.entity.JwtPayload;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
