@@ -6,7 +6,8 @@ import org.springframework.stereotype.Service;
 import io.roam.auth.dto.request.SignInRequest;
 import io.roam.auth.dto.request.SignUpRequest;
 import io.roam.auth.dto.response.SignUpResponse;
-import io.roam.auth.exception.UserAlreadyExistsException;
+import io.roam.auth.exception.EmailAlreadyExistsException;
+import io.roam.auth.exception.UserIdAlreadyExistsException;
 import io.roam.auth.exception.UserNotFoundException;
 import io.roam.jwt.entity.JwtPayload;
 import io.roam.jwt.entity.JwtToken;
@@ -38,10 +39,12 @@ public class AuthService {
     }
 
     public SignUpResponse signUp(SignUpRequest signUpRequest) {
-
+        if (userRepository.existsByUserId(signUpRequest.userId())) {
+            throw new UserIdAlreadyExistsException();
+        }
 
         if (userRepository.existsByEmail(signUpRequest.email())) {
-            throw new UserAlreadyExistsException();
+            throw new EmailAlreadyExistsException();
         }
 
         String encodedPassword = passwordEncoder.encode(signUpRequest.password());
