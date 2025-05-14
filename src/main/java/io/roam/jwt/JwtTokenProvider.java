@@ -4,13 +4,18 @@ import java.util.Date;
 import java.util.Map;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.roam.common.config.JwtConfig;
 import io.roam.jwt.entity.JwtPayload;
+import io.roam.jwt.exception.ExpiredTokenException;
+import io.roam.jwt.exception.InvalidTokenException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
@@ -21,7 +26,8 @@ public class JwtTokenProvider {
     private static final String BEARER_PREFIX = "Bearer ";
 
     // 클레임 관련 상수
-    private static final String EMAIL_CLAIM = "email";
+    private static final String CLIENT_ID_CLAIM = "clientId";
+    private static final String SOCIAL_TYPE_CLAIM = "socialType";
     private static final String ROLE_CLAIM = "role";
 
 
@@ -31,7 +37,8 @@ public class JwtTokenProvider {
     public String generateToken(JwtPayload payload, Long expirationTime) {
         // 사용자 정보 클레임 생성
         Map<String, Object> claims = Map.of(
-            EMAIL_CLAIM, payload.email(),
+            CLIENT_ID_CLAIM, payload.clientId(),
+            SOCIAL_TYPE_CLAIM, payload.socialType(),
             ROLE_CLAIM, payload.role()
         );
 
@@ -46,11 +53,15 @@ public class JwtTokenProvider {
     }
 
     /**
-     * HTTP 요청에서 Bearer 토큰을 추출합니다.
+     * HTTP 요청에서 토큰을 추출합니다.
+     * Bearer 접두사가 있으면 제거하고, 없으면 토큰 그대로 반환합니다.
      */
     public String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        return (bearerToken != null && bearerToken.startsWith(BEARER_PREFIX)) ? bearerToken.substring(BEARER_PREFIX.length()) : null;
+        String token = request.getHeader(AUTHORIZATION_HEADER);
+        if (token == null) {
+            return null;
+        }
+        return token.startsWith(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
     }
 
     /**
@@ -61,18 +72,33 @@ public class JwtTokenProvider {
     }
 
     /**
-     * 토큰에서 이메일 정보를 추출합니다.
+     * 토큰에서 클라이언트 아이디 정보를 추출합니다.
      */
-    public String getEmail(String token) {
+    public String getClientId(String token) {
         Claims claims = getClaims(token);
-        return claims != null ? getEmail(claims) : null;
+        return claims != null ? getClientId(claims) : null;
     }
 
     /**
-     * Claims에서 이메일 정보를 추출합니다.
+     * Claims에서 클라이언트 아이디 정보를 추출합니다.
      */
-    public String getEmail(Claims claims) {
-        return claims.get(EMAIL_CLAIM, String.class);
+    public String getClientId(Claims claims) {
+        return claims.get(CLIENT_ID_CLAIM, String.class);
+    }
+    
+    /**
+     * 토큰에서 소셜 타입 정보를 추출합니다.
+     */
+    public String getSocialType(String token) {
+        Claims claims = getClaims(token);
+        return claims != null ? getSocialType(claims) : null;
+    }
+
+    /**
+     * Claims에서 소셜 타입 정보를 추출합니다.
+     */
+    public String getSocialType(Claims claims) {
+        return claims.get(SOCIAL_TYPE_CLAIM, String.class);
     }
 
     /**
@@ -95,18 +121,16 @@ public class JwtTokenProvider {
      * 토큰이 유효하지 않은 경우 null을 반환합니다.
      */
     public Claims getClaims(String token) {
-        if (token == null) {
-            return null;
-        }
-        
         try {
             return Jwts.parser()
                 .verifyWith(jwtConfig.createSecretKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+        } catch (ExpiredJwtException e) {
+            throw new ExpiredTokenException();
         } catch (Exception e) {
-            return null;
+            throw new InvalidTokenException();
         }
     }
 }

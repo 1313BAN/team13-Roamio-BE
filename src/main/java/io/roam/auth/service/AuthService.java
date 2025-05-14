@@ -7,6 +7,7 @@ import io.roam.auth.dto.request.SignInRequest;
 import io.roam.auth.dto.request.SignUpRequest;
 import io.roam.auth.dto.response.SignUpResponse;
 import io.roam.auth.exception.EmailAlreadyExistsException;
+import io.roam.auth.exception.InvalidPasswordException;
 import io.roam.auth.exception.UserIdAlreadyExistsException;
 import io.roam.auth.exception.UserNotFoundException;
 import io.roam.jwt.entity.JwtPayload;
@@ -16,8 +17,6 @@ import io.roam.user.entity.SocialType;
 import io.roam.user.entity.User;
 import io.roam.user.entity.UserRole;
 import io.roam.user.repository.UserRepository;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -29,11 +28,16 @@ public class AuthService {
     
 
     public JwtToken signIn(SignInRequest request) {
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByUserId(request.userId())
+            .orElseThrow(UserNotFoundException::new);
+        
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new InvalidPasswordException();
+        }
 
         return jwtService.issueToken(JwtPayload.builder()
-                .email(user.getEmail())
+                .clientId(user.getUserId())
+                .socialType(user.getSocialType())
                 .role(user.getUserRole())
                 .build());
     }

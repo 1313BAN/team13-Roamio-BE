@@ -9,26 +9,37 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.Claims;
+import io.roam.common.exception.DomainException;
+import io.roam.jwt.exception.JwtAuthenticationException;
 import io.roam.user.entity.UserRole;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
                                     throws ServletException, IOException {
-        String token = jwtTokenProvider.resolveToken(request);
-        authenticateUserIfValidToken(token);
-        filterChain.doFilter(request, response);
+        try {
+            String token = jwtTokenProvider.resolveToken(request);
+            authenticateUserIfValidToken(token);
+            filterChain.doFilter(request, response);
+        } catch (DomainException e) {
+            log.error("e.getMessage(): {}", e);
+            authenticationEntryPoint.commence(request, response, new JwtAuthenticationException(e));
+            return;
+        }
     }
     
     /**
@@ -38,16 +49,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token == null) {
             return;
         }
-        
+
         Claims claims = jwtTokenProvider.getClaims(token);
-        if (claims != null) {
-            String email = jwtTokenProvider.getEmail(claims);
-            String role = jwtTokenProvider.getRole(claims);
-            
-            if (email != null && role != null) {
-                Authentication authentication = UserAuthentication.of(email, UserRole.valueOf(role));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        }
+        String clientId = jwtTokenProvider.getClientId(claims);
+        String socialType = jwtTokenProvider.getSocialType(claims);
+        String role = jwtTokenProvider.getRole(claims);
+
+        log.info("clientId: {}", clientId);
+        log.info("socialType: {}", socialType);
+        log.info("role: {}", role);
+        
+        Authentication authentication = UserAuthentication.of(socialType, clientId, UserRole.valueOf(role));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

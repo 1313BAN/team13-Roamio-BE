@@ -13,6 +13,9 @@ public enum GlobalErrorCode implements ErrorCode {
 
     VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "COMMON_400", "입력값 검증에 실패했습니다"),
 
+    AUTHENTICATION_REQUIRED(HttpStatus.UNAUTHORIZED, "COMMON_401", "인증이 필요합니다"),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "COMMON_403", "접근 권한이 없습니다"),
+
     ;
 
     private final HttpStatus httpStatus;

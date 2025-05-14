@@ -1,4 +1,4 @@
-package io.roam.user.entity;
+package io.roam.auth.constant;
 
 public enum SocialType {
     NONE,

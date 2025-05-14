@@ -19,12 +19,12 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 @RestControllerAdvice
 public class ExceptionAdvice {
     @ExceptionHandler(DomainException.class)
-    public ExceptionResponse domainException(DomainException e) {
+    public ExceptionResponse<?> domainException(DomainException e) {
         return ExceptionResponse.of(e.getErrorCode());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ExceptionResponse methodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public ExceptionResponse<?> methodArgumentNotValidException(MethodArgumentNotValidException e) {
         Map<String, String> fieldErrors = new HashMap<>();
         e.getBindingResult().getAllErrors().forEach((error)-> {
             String fieldName = ((FieldError) error).getField();
@@ -39,12 +39,12 @@ public class ExceptionAdvice {
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ExceptionResponse handleNotFound() {
+    public ExceptionResponse<?> handleNotFound() {
         return ExceptionResponse.of(GlobalErrorCode.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
-    public ExceptionResponse handleException() {
+    public ExceptionResponse<?> handleException() {
         return ExceptionResponse.of(GlobalErrorCode.INTERNAL_SERVER_ERROR);
     }
 }

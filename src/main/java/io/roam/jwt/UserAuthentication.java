@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
+import io.roam.jwt.entity.AuthUserDetail;
+import io.roam.user.entity.SocialType;
 import io.roam.user.entity.UserRole;
 
 public class UserAuthentication extends UsernamePasswordAuthenticationToken {
@@ -14,11 +16,20 @@ public class UserAuthentication extends UsernamePasswordAuthenticationToken {
         super(principal, credentials, authorities);
     }
 
-    public static UserAuthentication of(Object principal, Object credentials, UserRole role) {
-        return new UserAuthentication(principal, credentials, List.of(role));
-    }
+    public static UserAuthentication of(String socialType, String clientId, UserRole role) {
+        // 사용자 정보 생성 (principal)
+        AuthUserDetail userDetail = AuthUserDetail.builder()
+            .socialType(SocialType.valueOf(socialType))
+            .clientId(clientId)
+            .build();
 
-    public static UserAuthentication of(Object principal, UserRole role) {
-        return new UserAuthentication(principal, null, List.of(role));
+        // 사용자 권한 생성 (authorities)
+        List<GrantedAuthority> authorities = List.of(role);
+
+        return new UserAuthentication(
+            userDetail,
+            null,
+            authorities
+        );
     }
 }

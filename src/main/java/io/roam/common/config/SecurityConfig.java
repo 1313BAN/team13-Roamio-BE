@@ -17,9 +17,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.roam.common.exception.ErrorCode;
+import io.roam.common.exception.GlobalErrorCode;
 import io.roam.common.response.ExceptionResponse;
 import io.roam.jwt.JwtAuthenticationFilter;
-import io.roam.jwt.exception.JwtErrorCode;
+import io.roam.jwt.JwtAuthenticationEntryPoint;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
@@ -28,6 +30,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final ObjectMapper objectMapper;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -49,33 +52,34 @@ public class SecurityConfig {
                         .requestMatchers("/v3/**").permitAll()
 
                         // health check
-                        .requestMatchers("/health/**").permitAll()
+                        .requestMatchers("/health/**").authenticated()
 
                         // 인증
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
-                    // 인증 실패 (401 Unauthorized)
-                    .authenticationEntryPoint((request, response, authException) -> handleException(response, JwtErrorCode.AUTHENTICATION_REQUIRED))
+                    // 인증 실패 (401 Unauthorized) - JwtAuthenticationEntryPoint에서 JWT 관련 예외 처리
+                    .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                     // 권한 실패 (403 Forbidden)
-                    .accessDeniedHandler((request, response, accessDeniedException) -> handleException(response, JwtErrorCode.ACCESS_DENIED))
-                );
+                    .accessDeniedHandler((request, response, accessDeniedException) -> handleException(response, GlobalErrorCode.ACCESS_DENIED))
+                )
 
-
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                // JWT 인증 필터 추가
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                
         return http.build();
     }
 
     /**
      * 예외 응답을 처리하는 메서드
      */
-    private void handleException(HttpServletResponse response, JwtErrorCode errorCode) throws IOException {
+    private void handleException(HttpServletResponse response, ErrorCode errorCode) throws IOException {
+        ExceptionResponse<?> exceptionResponse = ExceptionResponse.of(errorCode);
+
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(errorCode.getHttpStatus().value());
         response.setCharacterEncoding("UTF-8");
-        
-        ExceptionResponse exceptionResponse = ExceptionResponse.of(errorCode);
         response.getWriter().write(objectMapper.writeValueAsString(exceptionResponse));
     }
 
