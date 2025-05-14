@@ -1,7 +1,5 @@
 package io.roam.user.entity;
 
-import io.roam.auth.constant.SocialType;
-import io.roam.auth.constant.UserRole;
 import io.roam.common.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +21,7 @@ public class User extends BaseTimeEntity {
     @Column(columnDefinition = "BIGINT UNSIGNED")
     private Long id;
 
-    @Column(nullable = true, unique = true)
+    @Column(nullable = false, unique = true)
     private String userId;
 
     @Column(nullable = true)
@@ -36,15 +34,13 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private SocialType socialType;
 
-    @Column(nullable = true)
-    private String socialId;
-
     @Column(nullable = false)
     private String name;
 
     @Column(nullable = true)
     private String profileImageUrl;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole userRole;
 }

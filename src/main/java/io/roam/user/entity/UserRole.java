@@ -1,4 +1,4 @@
-package io.roam.auth.constant;
+package io.roam.user.entity;
 
 import org.springframework.security.core.GrantedAuthority;
 

@@ -44,7 +44,8 @@ public class ExceptionAdvice {
     }
 
     @ExceptionHandler(Exception.class)
-    public ExceptionResponse<?> handleException() {
+    public ExceptionResponse<?> handleException(Exception e) {
+        log.error("내부 서버 오류 발생: ", e);
         return ExceptionResponse.of(GlobalErrorCode.INTERNAL_SERVER_ERROR);
     }
 }
