@@ -9,7 +9,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -23,13 +23,16 @@ public class ExceptionAdvice {
         return ExceptionResponse.of(e.getErrorCode());
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ExceptionResponse<?> httpMessageNotReadableException(HttpMessageNotReadableException e) {
+        return ExceptionResponse.of(GlobalErrorCode.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ExceptionResponse<?> methodArgumentNotValidException(MethodArgumentNotValidException e) {
         Map<String, String> fieldErrors = new HashMap<>();
-        e.getBindingResult().getAllErrors().forEach((error)-> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            fieldErrors.put(fieldName, errorMessage);
+        e.getBindingResult().getFieldErrors().forEach((fieldError) -> {
+            fieldErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
         });
         return ExceptionResponse.builder()
             .status(HttpStatus.BAD_REQUEST)
