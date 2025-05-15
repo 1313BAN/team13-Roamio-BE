@@ -18,7 +18,6 @@ jobs:
         with:
           java-version: '21'
           distribution: 'zulu'
-          cache: gradle
 
       - name: Create .env file
         run: |
@@ -28,4 +27,6 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: |
+          ./gradlew clean
+          ./gradlew build --refresh-dependencies
