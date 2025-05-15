@@ -3,7 +3,6 @@ server:
     port: ${SERVER_PORT}
 
 spring:
-
     application:
         name: roamio
 
@@ -27,13 +26,29 @@ spring:
     freemarker:
         cache: false
 
-mybatis:
-    mapper-locations: classpath:mappers/**/*.xml
-    type-aliases-package: com.ssafy.roamio.*.domain
-    configuration:
-        map-underscore-to-camel-case: true
+    jpa:
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                show-sql: true
+                format_sql: true
+                highlight_sql: true
+        open-in-view: false
+        database: mysql
+
+app:
+    jwt:
+        secret: ${JWT_SECRET}
+        access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+        refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
 
 logging:
     level:
-        com.ssafy: debug
-        org.mybatis: debug
+        web: trace
+
+oauth2:
+    google:
+        client-id: ${OAUTH2_GOOGLE_CLIENT_ID}
+        client-secret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
+        redirect-uri: ${OAUTH2_GOOGLE_REDIRECT_URI}

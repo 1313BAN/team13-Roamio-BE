@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ErrorResponseTest {
+class ExceptionResponseTest {
 
     @Mock
     private ErrorCode mockErrorCode;
@@ -26,13 +26,12 @@ class ErrorResponseTest {
         ErrorCode errorCode = GlobalErrorCode.BAD_REQUEST;
 
         // when
-        ErrorResponse response = ErrorResponse.of(errorCode);
+        ExceptionResponse response = ExceptionResponse.of(errorCode);
 
         // then
-        assertThat(response.status()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.success()).isFalse();
-        assertThat(response.code()).isEqualTo("GLOBAL_400");
-        assertThat(response.msg()).isEqualTo("Bad Request");
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.isSuccess()).isFalse();
+        assertThat(response.getCode()).isEqualTo("COMMON_400");
     }
 
     @Test
@@ -48,13 +47,13 @@ class ErrorResponseTest {
         when(mockErrorCode.getMessage()).thenReturn(message);
 
         // when
-        ErrorResponse response = ErrorResponse.of(mockErrorCode);
+        ExceptionResponse response = ExceptionResponse.of(mockErrorCode);
 
         // then
-        assertThat(response.status()).isEqualTo(status);
-        assertThat(response.success()).isFalse();
-        assertThat(response.code()).isEqualTo(code);
-        assertThat(response.msg()).isEqualTo(message);
+        assertThat(response.getStatus()).isEqualTo(status);
+        assertThat(response.isSuccess()).isFalse();
+        assertThat(response.getCode()).isEqualTo(code);
+        assertThat(response.getMsg()).isEqualTo(message);
     }
     
     @Test
@@ -64,7 +63,7 @@ class ErrorResponseTest {
         ErrorCode errorCode = null;
 
         // when & then
-        assertThatThrownBy(() -> ErrorResponse.of(errorCode))
+        assertThatThrownBy(() -> ExceptionResponse.of(errorCode))
                 .isInstanceOf(NullPointerException.class);
     }
 } 

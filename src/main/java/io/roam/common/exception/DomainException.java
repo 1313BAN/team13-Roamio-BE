@@ -1,7 +1,6 @@
 package io.roam.common.exception;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 public class DomainException extends RuntimeException {
