@@ -1,0 +1,13 @@
+bootJar { enabled = false }
+jar { enabled = true }
+
+dependencies {
+    // ===== Spring Framework =====
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // ===== MYSQL =====
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+}

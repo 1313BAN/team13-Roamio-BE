@@ -1,61 +1,56 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.4.5'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.springframework.boot' version '3.4.5'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'io.roam'
-version = '0.0.1-SNAPSHOT'
-
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+bootJar {
+    enabled = false
 }
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+jar {
+    enabled = true
 }
 
-repositories {
-	mavenCentral()
+allprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
 }
 
-dependencies {
-	// ===== Spring Framework =====
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	
-	// ===== DEVTOOLS =====
-	compileOnly 'org.springframework.boot:spring-boot-devtools'
+subprojects {
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
 
-	// ===== SWAGGER =====
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
-	
-	// ===== MYSQL =====
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	
-	// ===== JWT =====
-	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
-	implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
-	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.6'
-	
-	// ===== LOMBOK =====
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	
-	// ===== TEST =====
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testCompileOnly 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.projectlombok:lombok'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
 
-tasks.named('test') {
-	useJUnitPlatform()
+    dependencies {
+        // ===== TEST =====
+	    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testRuntimeOnly 'com.h2database:h2'
+
+        // ===== LOMBOK =====
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        testCompileOnly 'org.projectlombok:lombok'
+	    testAnnotationProcessor 'org.projectlombok:lombok'
+        
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+
 }
