@@ -41,7 +41,7 @@ public class GoogleOAuthService implements OAuthService {
         log.info("Google OAuth Request: {}", googleOAuthRequest);
 
         // Feign Client를 사용하여 액세스 토큰 발급
-        GoogleOAuthResponse tokenResponse = googleOAuthClient.getToken(googleOAuthRequest.toMap());
+        GoogleOAuthResponse tokenResponse = googleOAuthClient.getToken(googleOAuthRequest);
 
         if (tokenResponse == null) {
             throw new TokenResponseNullException();
