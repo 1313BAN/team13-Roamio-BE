@@ -1,6 +1,6 @@
 bootJar {
     enabled = true
-    mainClass = 'io.roam.websocket.WebSocketApplication'
+    mainClass = 'io.roam.WebSocketApplication'
 }
 
 jar { enabled = true }
