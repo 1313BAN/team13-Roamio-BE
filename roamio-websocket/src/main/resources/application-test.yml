@@ -1,0 +1,50 @@
+server:
+    address: 127.0.0.1
+    port: 8081
+
+spring:
+    application:
+        name: roamio
+
+    mvc:
+        static-path-pattern: /static/**
+
+    datasource:
+        driver-class-name: org.h2.Driver
+        url: jdbc:h2:mem:roamio-inmem-db;DATABASE_TO_UPPER=FALSE;mode=mysql
+        username: sa
+        password:
+
+    h2:
+        console:
+            enabled: true
+            path: /h2-console
+
+    devtools:
+        livereload:
+            enabled: true
+        restart:
+            enabled: true
+    freemarker:
+        cache: false
+
+    jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
+        hibernate:
+            ddl-auto: create
+        properties:
+            hibernate:
+                show-sql: true
+                format_sql: true
+                highlight_sql: true
+        open-in-view: false
+
+app:
+    jwt:
+        secret: test_jwt_secret_key_for_testing_purposes_only
+        access-token-expiration: 600000
+        refresh-token-expiration: 604800000
+
+logging:
+    level:
+        web: trace

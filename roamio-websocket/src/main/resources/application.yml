@@ -1,0 +1,55 @@
+server:
+    address: ${SERVER_ADDR}
+    port: 8081
+
+spring:
+    application:
+        name: roamio-websocket
+
+    config:
+        import: optional:file:.env[.properties]
+
+    mvc:
+        static-path-pattern: /static/**
+
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: ${DB_URL}
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+
+    devtools:
+        livereload:
+            enabled: true
+        restart:
+            enabled: true
+    freemarker:
+        cache: false
+
+    jpa:
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                show-sql: true
+                format_sql: true
+                highlight_sql: true
+        open-in-view: false
+        database: mysql
+
+app:
+    jwt:
+        secret: ${JWT_SECRET}
+        access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+        refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+
+logging:
+    level:
+        web: DEBUG
+
+oauth2:
+    google:
+        client-id: ${OAUTH2_GOOGLE_CLIENT_ID}
+        client-secret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
+        redirect-uri: ${OAUTH2_GOOGLE_REDIRECT_URI}
+
