@@ -9,6 +9,10 @@ import io.roam.external.oauth2.dto.request.GoogleOAuthRequest;
 import io.roam.external.oauth2.dto.response.GoogleOAuthResponse;
 import io.roam.external.oauth2.dto.response.GoogleUserInfoResponse;
 import io.roam.external.oauth2.dto.response.SocialAuthResponse;
+import io.roam.external.oauth2.exception.AuthenticationFailedException;
+import io.roam.external.oauth2.exception.TokenResponseNullException;
+import io.roam.external.oauth2.exception.UserInfoApiCallFailedException;
+import io.roam.external.oauth2.exception.UserInfoResponseNullException;
 import io.roam.user.type.SocialType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,11 +46,11 @@ public class GoogleOAuthService implements OAuthService {
             tokenResponse = googleOAuthClient.getToken(googleOAuthRequest.toMap());
         } catch (Exception e) {
             log.error("Google OAuth Authentication Failed: {}", e.getMessage());
-            throw new RuntimeException("Google OAuth Authentication Failed", e);
+            throw new AuthenticationFailedException();
         }
 
         if (tokenResponse == null) {
-            throw new RuntimeException("tokenResponse is null");
+            throw new TokenResponseNullException();
         }
         
         log.info("Google OAuth Token Response: {}", tokenResponse);
@@ -57,11 +61,11 @@ public class GoogleOAuthService implements OAuthService {
             userInfoResponse = googleUserInfoClient.getUserInfo("Bearer " + tokenResponse.accessToken());
         } catch (Exception e) {
             log.error("Google User Info API Call Failed: {}", e.getMessage());
-            throw new RuntimeException("Google User Info API Call Failed", e);
+            throw new UserInfoApiCallFailedException();
         }
         
         if (userInfoResponse == null) {
-            throw new RuntimeException("userInfoResponse is null");
+            throw new UserInfoResponseNullException();
         }
         
         log.info("Google User Info Response: {}", userInfoResponse);
