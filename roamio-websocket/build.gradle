@@ -1,4 +1,9 @@
-jar { enabled = false }
+bootJar {
+    enabled = true
+    mainClass = 'io.roam.websocket.WebSocketApplication'
+}
+
+jar { enabled = true }
 
 dependencies {
     // ===== Project =====
@@ -7,6 +12,7 @@ dependencies {
 
     // ===== Spring Framework =====
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     // ===== SWAGGER =====

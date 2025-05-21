@@ -1,5 +1,5 @@
 server:
-    address: ${SERVER_ADDR}
+    address: ${API_SERVER_ADDR}
     port: 8081
 
 spring:

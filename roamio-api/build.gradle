@@ -1,4 +1,9 @@
-jar { enabled = false }
+bootJar {
+    enabled = true
+    mainClass = 'io.roam.RoamioApplication'
+}
+
+jar { enabled = true }
 
 dependencies {
     // ===== Project =====
