@@ -41,13 +41,7 @@ public class GoogleOAuthService implements OAuthService {
         log.info("Google OAuth Request: {}", googleOAuthRequest);
 
         // Feign Client를 사용하여 액세스 토큰 발급
-        GoogleOAuthResponse tokenResponse;
-        try {
-            tokenResponse = googleOAuthClient.getToken(googleOAuthRequest.toMap());
-        } catch (Exception e) {
-            log.error("Google OAuth Authentication Failed: {}", e.getMessage());
-            throw new AuthenticationFailedException();
-        }
+        GoogleOAuthResponse tokenResponse = googleOAuthClient.getToken(googleOAuthRequest.toMap());
 
         if (tokenResponse == null) {
             throw new TokenResponseNullException();
@@ -56,13 +50,7 @@ public class GoogleOAuthService implements OAuthService {
         log.info("Google OAuth Token Response: {}", tokenResponse);
             
         // Feign Client를 사용하여 사용자 정보 API 호출
-        GoogleUserInfoResponse userInfoResponse;
-        try {
-            userInfoResponse = googleUserInfoClient.getUserInfo("Bearer " + tokenResponse.accessToken());
-        } catch (Exception e) {
-            log.error("Google User Info API Call Failed: {}", e.getMessage());
-            throw new UserInfoApiCallFailedException();
-        }
+        GoogleUserInfoResponse userInfoResponse = googleUserInfoClient.getUserInfo("Bearer " + tokenResponse.accessToken());
         
         if (userInfoResponse == null) {
             throw new UserInfoResponseNullException();
