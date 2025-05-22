@@ -51,19 +51,25 @@ public class SecurityConfig {
 
                 // URL 권한 설정
                 .authorizeHttpRequests(authorizeRequest -> authorizeRequest
-                        // 인증
-                        .requestMatchers("/ws/**").permitAll()
-                        .anyRequest().authenticated()
+                        // Handshake 요청 허용
+                        .requestMatchers("/connect/**").permitAll()
+
+                        // 메시지 전송 / 수신 요청 인증 (세션 유지 중)
+                        .requestMatchers("/pub/**").authenticated()
+                        .requestMatchers("/sub/**").authenticated()
+
+                        // 나머지 요청 거절
+                        .anyRequest().denyAll()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                     // 인증 실패 (401 Unauthorized) - JwtAuthenticationEntryPoint에서 JWT 관련 예외 처리
                     .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                     // 권한 실패 (403 Forbidden)
                     .accessDeniedHandler((request, response, accessDeniedException) -> handleException(response, GlobalErrorCode.ACCESS_DENIED))
-                )
+                );
 
                 // JWT 인증 필터 추가
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                // .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
                 
         return http.build();
     }
