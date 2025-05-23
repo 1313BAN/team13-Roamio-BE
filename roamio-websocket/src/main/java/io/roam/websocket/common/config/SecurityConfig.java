@@ -1,4 +1,4 @@
-package io.roam.websocket.config;
+package io.roam.websocket.common.config;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -24,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.roam.common.type.ErrorCode;
 import io.roam.common.type.GlobalErrorCode;
 import io.roam.common.response.ExceptionResponse;
-import io.roam.jwt.JwtAuthenticationFilter;
 import io.roam.jwt.JwtAuthenticationEntryPoint;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -32,7 +30,6 @@ import jakarta.servlet.http.HttpServletResponse;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final ObjectMapper objectMapper;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
@@ -54,10 +51,6 @@ public class SecurityConfig {
                         // Handshake 요청 허용
                         .requestMatchers("/connect/**").permitAll()
 
-                        // 메시지 전송 / 수신 요청 인증 (세션 유지 중)
-                        .requestMatchers("/pub/**").authenticated()
-                        .requestMatchers("/sub/**").authenticated()
-
                         // 나머지 요청 거절
                         .anyRequest().denyAll()
                 )
@@ -67,9 +60,6 @@ public class SecurityConfig {
                     // 권한 실패 (403 Forbidden)
                     .accessDeniedHandler((request, response, accessDeniedException) -> handleException(response, GlobalErrorCode.ACCESS_DENIED))
                 );
-
-                // JWT 인증 필터 추가
-                // .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
                 
         return http.build();
     }
