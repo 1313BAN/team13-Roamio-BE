@@ -14,6 +14,7 @@ import io.roam.websocket.plan.controller.PlanController;
 import io.roam.websocket.plan.domain.PlanMessage;
 import io.roam.websocket.plan.domain.PlanMessageType;
 import io.roam.websocket.plan.dto.PlanEnterResponse;
+import io.roam.websocket.plan.dto.PlanLeaveResponse;
 import io.roam.websocket.plan.service.PlanSessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,8 +42,8 @@ public class PlanWebSocketHandler extends TextWebSocketHandler {
 
                 session.getAttributes().put("planId", planId);
                 PlanEnterResponse planEnterResponse = PlanEnterResponse.builder()
-                    .clientId((String) session.getAttributes().get("clientId"))
-                    .name(session.getId())
+                    .userId((String) session.getAttributes().get("userId"))
+                    .name((String) session.getAttributes().get("name"))
                     .build();
                 planSessionService.sendMessageToGroup(planId, PlanMessage.of(PlanMessageType.ENTER, planEnterResponse));
                 planSessionService.addSession(planId, session);
@@ -78,6 +79,10 @@ public class PlanWebSocketHandler extends TextWebSocketHandler {
         if (session.getAttributes().get("queryParams") instanceof Map queryParams) {
             String planId = (String) queryParams.get("planId");
             planSessionService.removeSession(planId, session);
+            PlanLeaveResponse planLeaveResponse = PlanLeaveResponse.builder()
+                .userId((String) session.getAttributes().get("userId"))
+                .build();
+            planSessionService.sendMessageToGroup(planId, PlanMessage.of(PlanMessageType.LEAVE, planLeaveResponse));
         }
     }
 }

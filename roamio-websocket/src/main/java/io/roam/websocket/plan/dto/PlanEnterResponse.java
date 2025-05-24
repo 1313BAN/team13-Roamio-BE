@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record PlanEnterResponse(
-    String clientId,
+    String userId,
     String name
 ) {    
 }

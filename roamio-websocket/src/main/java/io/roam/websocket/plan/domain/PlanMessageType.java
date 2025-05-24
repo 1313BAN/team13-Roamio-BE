@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 public enum PlanMessageType {
     ENTER("ENTER"),
+    LEAVE("LEAVE"),
     POS("POS"),
     UNKNOWN("UNKNOWN");
 

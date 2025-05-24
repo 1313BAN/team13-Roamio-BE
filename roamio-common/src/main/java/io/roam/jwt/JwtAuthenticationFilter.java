@@ -51,15 +51,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         Claims claims = jwtTokenProvider.getClaims(token);
-        String clientId = jwtTokenProvider.getClientId(claims);
+        String userId = jwtTokenProvider.getUserId(claims);
         String socialType = jwtTokenProvider.getSocialType(claims);
         String role = jwtTokenProvider.getRole(claims);
 
-        log.info("clientId: {}", clientId);
+        log.info("userId: {}", userId);
         log.info("socialType: {}", socialType);
         log.info("role: {}", role);
         
-        Authentication authentication = UserAuthentication.of(socialType, clientId, UserRole.valueOf(role));
+        Authentication authentication = UserAuthentication.of(socialType, userId, UserRole.valueOf(role));
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

@@ -44,19 +44,21 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
             Claims claims = jwtTokenProvider.getClaims(token);
 
             // 인증 정보 설정
-            String clientId = jwtTokenProvider.getClientId(claims);
+            String userId = jwtTokenProvider.getUserId(claims);
+            String name = jwtTokenProvider.getName(claims);
             String socialType = jwtTokenProvider.getSocialType(claims);
             String role = jwtTokenProvider.getRole(claims);
         
-            Authentication authentication = UserAuthentication.of(socialType, clientId, UserRole.valueOf(role));
+            Authentication authentication = UserAuthentication.of(socialType, userId, UserRole.valueOf(role));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             attributes.put("queryParams", queryParams);
-            attributes.put("clientId", clientId);
+            attributes.put("userId", userId);
+            attributes.put("name", name);
             attributes.put("socialType", socialType);
             attributes.put("role", role);
 
-            log.info("clientId: {} / socialType: {} / role: {}", clientId, socialType, role);
+            log.info("userId: {} / socialType: {} / role: {}", userId, socialType, role);
             return true;
         } catch (Exception e) {
             log.error("Handshake failed: {}", e.getMessage(), e);
