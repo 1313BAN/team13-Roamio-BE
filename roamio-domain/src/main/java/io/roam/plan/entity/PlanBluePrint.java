@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import io.roam.common.entity.BaseTimeEntity;
+import io.roam.plan.type.PlaceType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -50,7 +51,7 @@ public class PlanBluePrint extends BaseTimeEntity {
     private String placeId;
 
     @Column(columnDefinition = "DECIMAL(10, 5)", nullable = false)
-    private BigDecimal order;
+    private BigDecimal position;
 
     @Column(updatable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime startTime;

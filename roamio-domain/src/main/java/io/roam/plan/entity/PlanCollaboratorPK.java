@@ -6,6 +6,6 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode
 public class PlanCollaboratorPK implements Serializable {
-    private Long planId;
-    private Long userId;
+    private Long plan;
+    private Long user;
 }

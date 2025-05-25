@@ -15,5 +15,5 @@ public interface PlanBluePrintRepository extends JpaRepository<PlanBluePrint, Lo
      * @param planId 플랜 아이디
      * @return 정렬된 플랜 블루프린트 목록
      */
-    List<PlanBluePrint> findByPlanIdOrderByDayAscOrderAsc(Long planId);
+    List<PlanBluePrint> findByPlanIdOrderByDayAscPositionAsc(Long planId);
 }

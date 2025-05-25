@@ -55,8 +55,8 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/**").permitAll()
 
-                        // health check
-                        .requestMatchers("/health/**").authenticated()
+                        // Plan API
+                        .requestMatchers("/api/plan/**").authenticated()
 
                         // 인증
                         .requestMatchers("/api/auth/**").permitAll()

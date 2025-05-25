@@ -1,4 +1,4 @@
-package io.roam.plan.entity;
+package io.roam.plan.type;
 
 public enum PlaceType {
     ACCOMODATION,
