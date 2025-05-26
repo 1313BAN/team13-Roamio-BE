@@ -11,7 +11,9 @@ import io.roam.websocket.plan.domain.PlanMessageType;
 import io.roam.websocket.plan.dto.ConnectedUserResponse;
 import io.roam.websocket.plan.dto.ConnectedUsersListResponse;
 import io.roam.websocket.plan.dto.PlanBlueprintWebSocketResponse;
+import io.roam.websocket.plan.dto.PlanBlueprintListResponse;
 import io.roam.websocket.plan.dto.PlanCursorResponse;
+import io.roam.websocket.plan.dto.PlanBlueprintListResponse;
 import io.roam.websocket.plan.dto.request.PlanBlueprintRequest;
 import io.roam.websocket.plan.service.PlanSessionService;
 import io.roam.websocket.plan.service.PlanService;
@@ -120,6 +122,27 @@ public class PlanController {
                 session.getId(), response.users().size());
         } catch (Exception e) {
             log.error("Error sending user list: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 플랜 블루프린트 리스트를 요청한 사용자에게 전송합니다.
+     * @param session 요청한 사용자의 웹소켓 세션
+     */
+    public void sendBlueprintListToSession(WebSocketSession session) {
+        try {
+            String planId = (String) session.getAttributes().get("planId");
+            
+            PlanBlueprintListResponse response = planService.getPlanBlueprintList(Long.valueOf(planId));
+
+            // 요청한 사용자에게만 블루프린트 리스트 전송
+            planSessionService.sendMessageToSession(session, 
+                PlanMessage.of(PlanMessageType.BLUEPRINT_LIST, response));
+                
+            log.info("Sent blueprint list to session: {}, blueprints count: {}", 
+                session.getId(), response.blueprints().size());
+        } catch (Exception e) {
+            log.error("Error sending blueprint list: {}", e.getMessage(), e);
         }
     }
 

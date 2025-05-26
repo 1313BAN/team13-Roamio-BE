@@ -13,6 +13,7 @@ import io.roam.user.entity.User;
 import io.roam.websocket.plan.dto.ConnectedUserResponse;
 import io.roam.websocket.plan.dto.ConnectedUsersListResponse;
 import io.roam.websocket.plan.dto.PlanBlueprintWebSocketResponse;
+import io.roam.websocket.plan.dto.PlanBlueprintListResponse;
 import io.roam.websocket.plan.dto.request.PlanBlueprintRequest;
 import io.roam.websocket.plan.service.PlanSessionService;
 import lombok.RequiredArgsConstructor;
@@ -137,5 +138,32 @@ public class PlanService {
             log.error("Error deleting blueprint: {}", e.getMessage(), e);
             throw e;
         }
+    }
+    
+    /**
+     * 플랜의 모든 블루프린트 리스트를 조회합니다.
+     * @param planId 플랜 ID
+     * @return 블루프린트 리스트 응답
+     */
+    public PlanBlueprintListResponse getPlanBlueprintList(Long planId) {
+        List<PlanBlueprint> blueprints = planBlueprintRepository.findByPlanIdOrderByDayAscPositionAsc(planId);
+        
+        List<PlanBlueprintWebSocketResponse> blueprintResponses = blueprints.stream()
+            .map(blueprint -> PlanBlueprintWebSocketResponse.builder()
+                .id(blueprint.getId())
+                .planId(planId)
+                .day(blueprint.getDay())
+                .position(blueprint.getPosition())
+                .placeId(blueprint.getPlaceId())
+                .latitude(blueprint.getLatitude())
+                .longitude(blueprint.getLongitude())
+                .startTime(blueprint.getStartTime())
+                .endTime(blueprint.getEndTime())
+                .memo(blueprint.getMemo())
+                .action("INIT")
+                .build())
+            .toList();
+        
+        return new PlanBlueprintListResponse(blueprintResponses);
     }
 }

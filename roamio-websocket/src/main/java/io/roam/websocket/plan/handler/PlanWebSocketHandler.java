@@ -60,7 +60,7 @@ public class PlanWebSocketHandler extends TextWebSocketHandler {
                     .profileImageUrl(user.getProfileImageUrl())
                     .build();
                 planSessionService.sendMessageToGroup(planId, PlanMessage.of(PlanMessageType.ENTER, connectedUserResponse));
-                planController.sendUserListToSession(session);
+                planController.sendBlueprintListToSession(session);
                 planSessionService.addSession(planId, session);
             } else {
                 throw new IllegalArgumentException();
