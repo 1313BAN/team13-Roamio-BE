@@ -7,7 +7,10 @@ import lombok.Getter;
 public enum PlanMessageType {
     ENTER("ENTER"),
     LEAVE("LEAVE"),
+    USER_LIST("USER_LIST"),
     POS("POS"),
+    BLUEPRINT("BLUEPRINT"),
+    REMOVE_BLUEPRINT("REMOVE_BLUEPRINT"),
     UNKNOWN("UNKNOWN");
 
     private final String type;
@@ -24,5 +27,4 @@ public enum PlanMessageType {
             return UNKNOWN;
         }
     }
-
 }

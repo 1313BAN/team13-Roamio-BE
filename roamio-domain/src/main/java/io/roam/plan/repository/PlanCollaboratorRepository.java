@@ -18,6 +18,8 @@ public interface PlanCollaboratorRepository extends JpaRepository<PlanCollaborat
 
     List<PlanCollaborator> findByUserId(Long userId);
 
+    Boolean existsByPlanIdAndUserId(Long planId, Long userId);
+
     @Query("""
         SELECT pc FROM PlanCollaborator pc
         JOIN FETCH pc.plan p

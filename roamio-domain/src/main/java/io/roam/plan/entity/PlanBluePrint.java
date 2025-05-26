@@ -30,10 +30,10 @@ import lombok.Setter;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = {
-    @Index(name = "idx_plan_blue_print_plan_id", columnList = "plan_id")
+    @Index(name = "idx_plan_blue_print_plan_id_day", columnList = "plan_id, day")
 })
 @Entity
-public class PlanBluePrint extends BaseTimeEntity {
+public class PlanBlueprint extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

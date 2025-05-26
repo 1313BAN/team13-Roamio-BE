@@ -80,7 +80,7 @@ public class PlanSessionService {
             Flux.fromIterable(group)
                 .parallel()  // 병렬 처리 활성화
                 .runOn(Schedulers.parallel())  // 병렬 스케줄러 사용
-                .flatMap(session -> sendMessageToSession(session, textMessage))
+                .flatMap(session -> sendMessageToSessionMono(session, textMessage))
                 .sequential()  // 결과를 다시 순차적으로 모음
                 .doOnComplete(() -> log.debug("Message sent to all {} sessions in plan {}", group.size(), planId))
                 .doOnError(e -> log.error("Error sending message to sessions in plan {}: {}", planId, e.getMessage(), e))
@@ -91,7 +91,33 @@ public class PlanSessionService {
         }
     }
 
-    private Mono<Boolean> sendMessageToSession(WebSocketSession session, TextMessage message) {
+    /**
+     * 단일 세션에 메시지를 전송합니다.
+     * @param session 메시지를 전송할 세션
+     * @param planMessage 전송할 메시지
+     */
+    public void sendMessageToSession(WebSocketSession session, PlanMessage<?> planMessage) {
+        try {
+            // 메시지를 JSON 문자열로 직렬화
+            String messageJson = objectMapper.writeValueAsString(planMessage);
+            TextMessage textMessage = new TextMessage(messageJson);
+            
+            // 단일 세션에 메시지 전송
+            sendMessageToSessionMono(session, textMessage)
+                .doOnSuccess(success -> {
+                    if (success) {
+                        log.debug("Message sent to session {}", session.getId());
+                    }
+                })
+                .doOnError(e -> log.error("Error sending message to session {}: {}", session.getId(), e.getMessage(), e))
+                .subscribe();
+                
+        } catch (Exception e) {
+            log.error("Failed to serialize message for session {}: {}", session.getId(), e.getMessage(), e);
+        }
+    }
+
+    private Mono<Boolean> sendMessageToSessionMono(WebSocketSession session, TextMessage message) {
         return Mono.fromCallable(() -> {
             try {
                 if (session.isOpen()) {

@@ -1,6 +1,7 @@
 package io.roam.websocket.plan.handler;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -10,10 +11,13 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.roam.plan.repository.PlanCollaboratorRepository;
+import io.roam.user.entity.User;
+import io.roam.user.repository.UserRepository;
 import io.roam.websocket.plan.controller.PlanController;
 import io.roam.websocket.plan.domain.PlanMessage;
 import io.roam.websocket.plan.domain.PlanMessageType;
-import io.roam.websocket.plan.dto.PlanEnterResponse;
+import io.roam.websocket.plan.dto.ConnectedUserResponse;
 import io.roam.websocket.plan.dto.PlanLeaveResponse;
 import io.roam.websocket.plan.service.PlanSessionService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +28,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PlanWebSocketHandler extends TextWebSocketHandler {
 
+    private final UserRepository userRepository;
+
     private final PlanController planController;
+    private final PlanCollaboratorRepository planCollaboratorRepository;
     private final PlanSessionService planSessionService;
     private final ObjectMapper objectMapper;
 
@@ -38,21 +45,29 @@ public class PlanWebSocketHandler extends TextWebSocketHandler {
                     throw new IllegalArgumentException();
                 }
 
-                // TODO: 플랜 접근 권한 확인
-
+                // 플랜 접근 권한 확인
+                User user = userRepository.findByUserId((String) session.getAttributes().get("userId")).get();
+                if (!planCollaboratorRepository.existsByPlanIdAndUserId(Long.parseLong(planId), user.getId())) {
+                    throw new IllegalArgumentException();
+                }
+                session.getAttributes().put("user", user);
                 session.getAttributes().put("planId", planId);
-                PlanEnterResponse planEnterResponse = PlanEnterResponse.builder()
-                    .userId((String) session.getAttributes().get("userId"))
-                    .name((String) session.getAttributes().get("name"))
+
+                ConnectedUserResponse connectedUserResponse = ConnectedUserResponse.builder()
+                    .userId(user.getUserId())
+                    .email(user.getEmail())
+                    .name(user.getName())
+                    .profileImageUrl(user.getProfileImageUrl())
                     .build();
-                planSessionService.sendMessageToGroup(planId, PlanMessage.of(PlanMessageType.ENTER, planEnterResponse));
+                planSessionService.sendMessageToGroup(planId, PlanMessage.of(PlanMessageType.ENTER, connectedUserResponse));
+                planController.sendUserListToSession(session);
                 planSessionService.addSession(planId, session);
             } else {
                 throw new IllegalArgumentException();
             }
         } catch (Exception e) {
             log.error("Error in afterConnectionEstablished: {}", e.getMessage(), e);
-            session.close(CloseStatus.PROTOCOL_ERROR);
+            session.close(CloseStatus.NOT_ACCEPTABLE);
         }
     }
 

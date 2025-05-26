@@ -23,11 +23,11 @@ import lombok.*;
 public class PlanCollaborator {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "plan_id")
+    @JoinColumn(name = "plan_id", columnDefinition = "BIGINT UNSIGNED")
     private Plan plan;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", columnDefinition = "BIGINT UNSIGNED")
     private User user;
 }

@@ -35,7 +35,7 @@ public class Plan extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", nullable = false)
+    @JoinColumn(name = "owner_id", columnDefinition = "BIGINT UNSIGNED", nullable = false)
     private User owner;
 
     @Column(nullable = false)
@@ -51,5 +51,5 @@ public class Plan extends BaseTimeEntity {
     private LocalDateTime endDate;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PlanBluePrint> bluePrints;
+    private List<PlanBlueprint> blueprints;
 }
