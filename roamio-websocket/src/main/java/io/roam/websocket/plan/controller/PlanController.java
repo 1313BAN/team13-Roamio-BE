@@ -81,28 +81,22 @@ public class PlanController {
         try {
             String planId = (String) session.getAttributes().get("planId");
             
-            // payload에서 blueprintId 추출
-            Long blueprintId;
+            // payload를 PlanBlueprintRequest로 변환
+            PlanBlueprintRequest request;
             if (payload instanceof String) {
-                blueprintId = Long.valueOf((String) payload);
-            } else if (payload instanceof Number) {
-                blueprintId = ((Number) payload).longValue();
-            } else if (payload instanceof Map) {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> payloadMap = (Map<String, Object>) payload;
-                blueprintId = Long.valueOf(payloadMap.get("blueprintId").toString());
+                request = objectMapper.readValue((String) payload, PlanBlueprintRequest.class);
             } else {
-                throw new IllegalArgumentException("Invalid payload format for blueprint deletion");
+                request = objectMapper.convertValue(payload, PlanBlueprintRequest.class);
             }
             
             // Blueprint 삭제 처리
-            PlanBlueprintWebSocketResponse response = planService.deleteBlueprint(Long.valueOf(planId), blueprintId);
+            PlanBlueprintWebSocketResponse response = planService.deleteBlueprint(Long.valueOf(planId), request.id());
             
             // 같은 플랜에 접속한 모든 사용자에게 Blueprint 삭제 알림 전송
             planSessionService.sendMessageToGroup(planId, 
                 PlanMessage.of(PlanMessageType.REMOVE_BLUEPRINT, response));
                 
-            log.info("Blueprint deleted for plan: {}, blueprint ID: {}", planId, blueprintId);
+            log.info("Blueprint deleted for plan: {}, blueprint ID: {}", planId, request.id());
         } catch (Exception e) {
             log.error("Error processing blueprint deletion: {}", e.getMessage(), e);
         }
