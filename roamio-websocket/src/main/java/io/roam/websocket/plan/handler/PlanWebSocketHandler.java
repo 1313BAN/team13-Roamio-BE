@@ -73,7 +73,7 @@ public class PlanWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        log.info("Received message from {}: {}", session.getId(), message.getPayload());
+        // log.info("Received message from {}: {}", session.getId(), message.getPayload());
         PlanMessage planMessage = objectMapper.readValue(message.getPayload(), PlanMessage.class);
         planController.dispatch(session, planMessage);
     }

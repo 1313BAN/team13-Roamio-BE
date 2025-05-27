@@ -12,6 +12,8 @@ public enum PlanMessageType {
     BLUEPRINT("BLUEPRINT"),
     BLUEPRINT_LIST("BLUEPRINT_LIST"),
     REMOVE_BLUEPRINT("REMOVE_BLUEPRINT"),
+    UPDATE_DATE("UPDATE_DATE"),
+    SEND("SEND"),
     UNKNOWN("UNKNOWN");
 
     private final String type;

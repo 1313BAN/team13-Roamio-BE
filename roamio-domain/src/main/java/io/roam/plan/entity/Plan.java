@@ -44,10 +44,10 @@ public class Plan extends BaseTimeEntity {
     @Column(nullable = false)
     private String description;
 
-    @Column(name = "start_date", updatable = false, columnDefinition = "TIMESTAMP")
+    @Column(name = "start_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime startDate;
 
-    @Column(name = "end_date", updatable = false, columnDefinition = "TIMESTAMP")
+    @Column(name = "end_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime endDate;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)

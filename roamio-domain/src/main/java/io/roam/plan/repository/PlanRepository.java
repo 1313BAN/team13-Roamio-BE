@@ -21,6 +21,10 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
      * @param planId 플랜 아이디
      * @return Plan 엔티티의 프록시 객체
      */
-    @Query("SELECT p FROM Plan p WHERE p.id = :planId")
+    @Query("""
+        SELECT p FROM Plan p
+        JOIN FETCH p.owner
+        WHERE p.id = :planId
+    """)
     Plan getReference(@Param("planId") Long planId);
 }

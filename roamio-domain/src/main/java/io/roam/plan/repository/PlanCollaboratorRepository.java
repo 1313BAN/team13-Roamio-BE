@@ -29,7 +29,8 @@ public interface PlanCollaboratorRepository extends JpaRepository<PlanCollaborat
     List<PlanCollaborator> findWithPlanAndOwnerByUserId(@Param("userId") Long userId);
 
     @Query("""
-        SELECT  pc.user.email as email,
+        SELECT  pc.user.userId as userId,
+                pc.user.email as email,
                 pc.user.name as userName,
                 pc.user.profileImageUrl as profileImageUrl
         FROM PlanCollaborator pc

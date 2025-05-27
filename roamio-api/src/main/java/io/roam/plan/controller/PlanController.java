@@ -11,10 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import io.roam.common.response.ApiResponse;
 import io.roam.plan.dto.request.PlanBlueprintRequest;
 import io.roam.plan.dto.request.PlanCreateRequest;
+import io.roam.plan.dto.request.PlanInviteRequest;
 import io.roam.plan.dto.response.PlanBlueprintResponse;
 import io.roam.plan.dto.response.PlanBlueprintsResponse;
+import io.roam.plan.dto.response.PlanCollaboratorsResponse;
 import io.roam.plan.dto.response.PlanCreateResponse;
+import io.roam.plan.dto.response.PlanInviteResponse;
 import io.roam.plan.dto.response.PlanListResponse;
+import io.roam.plan.dto.response.PlanOwnerResponse;
 import io.roam.plan.service.PlanService;
 import lombok.RequiredArgsConstructor;
 
@@ -53,5 +57,23 @@ public class PlanController implements PlanApi {
     public ApiResponse<Void> deletePlanBlueprint(@PathVariable Long planId, @PathVariable Long blueprintId) {
         planService.deletePlanBlueprint(planId, blueprintId);
         return ApiResponse.of(null);
+    }
+
+    @Override
+    @GetMapping("/{planId}/owner")
+    public ApiResponse<PlanOwnerResponse> getPlanOwner(@PathVariable Long planId) {
+        return ApiResponse.of(planService.getPlanOwner(planId));
+    }
+
+    @Override
+    @GetMapping("/{planId}/collaborators")
+    public ApiResponse<PlanCollaboratorsResponse> getPlanCollaborators(@PathVariable Long planId) {
+        return ApiResponse.of(planService.getPlanCollaborators(planId));
+    }
+
+    @Override
+    @PostMapping("/{planId}/invite")
+    public ApiResponse<PlanInviteResponse> invitePlanCollaborator(@PathVariable Long planId, @RequestBody PlanInviteRequest request) {
+        return ApiResponse.of(planService.invitePlanCollaborator(planId, request));
     }
 }

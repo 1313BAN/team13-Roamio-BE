@@ -15,17 +15,24 @@ import io.roam.common.exception.DomainException;
 import io.roam.jwt.entity.AuthUserDetail;
 import io.roam.plan.dto.request.PlanBlueprintRequest;
 import io.roam.plan.dto.request.PlanCreateRequest;
+import io.roam.plan.dto.request.PlanInviteRequest;
 import io.roam.plan.dto.response.PlanBlueprintResponse;
 import io.roam.plan.dto.response.PlanBlueprintsResponse;
+import io.roam.plan.dto.response.PlanCollaboratorResponse;
+import io.roam.plan.dto.response.PlanCollaboratorsResponse;
 import io.roam.plan.dto.response.PlanCreateResponse;
+import io.roam.plan.dto.response.PlanInviteResponse;
 import io.roam.plan.dto.response.PlanListResponse;
+import io.roam.plan.dto.response.PlanOwnerResponse;
 import io.roam.plan.dto.response.PlanResponse;
 import io.roam.plan.entity.Plan;
 import io.roam.plan.entity.PlanBlueprint;
 import io.roam.plan.entity.PlanCollaborator;
+import io.roam.plan.entity.PlanCollaboratorInfo;
 import io.roam.plan.repository.PlanBlueprintRepository;
 import io.roam.plan.repository.PlanCollaboratorRepository;
 import io.roam.plan.repository.PlanRepository;
+import io.roam.plan.type.PlanErrorCode;
 import io.roam.user.entity.User;
 import io.roam.user.repository.UserRepository;
 import io.roam.user.type.UserErrorCode;
@@ -167,4 +174,83 @@ public class PlanService {
         // blueprint 삭제
         planBlueprintRepository.delete(blueprint);
     }
+
+    /**
+     * 계획의 소유자 정보를 조회합니다.
+     * @param planId 계획 아이디
+     * @return 계획 소유자 정보
+     * @throws RuntimeException 계획이 존재하지 않는 경우
+     */
+    public PlanOwnerResponse getPlanOwner(Long planId) {
+        User owner = planRepository.getReference(planId).getOwner();
+        
+        return PlanOwnerResponse.builder()
+            .userId(owner.getUserId())
+            .email(owner.getEmail())
+            .name(owner.getName())
+            .build();
+    }
+
+    /**
+     * 계획의 협력자 목록을 조회합니다.
+     * @param planId 계획 아이디
+     * @return 계획 협력자 목록
+     */
+    public PlanCollaboratorsResponse getPlanCollaborators(Long planId) {
+        List<PlanCollaboratorInfo> collaboratorInfos = planCollaboratorRepository.getCollaboratorListByPlanId(planId);
+        
+        List<PlanCollaboratorResponse> collaboratorResponses = collaboratorInfos.stream()
+            .map(info -> PlanCollaboratorResponse.builder()
+                .userId(info.getUserId())
+                .email(info.getEmail())
+                .name(info.getUserName())
+                .profileImageUrl(info.getProfileImageUrl())
+                .build())
+            .toList();
+        
+        return PlanCollaboratorsResponse.builder()
+            .collaborators(collaboratorResponses)
+            .build();
+    }
+
+    /**
+     * 계획에 협력자를 초대합니다.
+     * @param planId 계획 아이디
+     * @param request 초대 요청 정보
+     * @return 초대 결과
+     * @throws RuntimeException 계획이 존재하지 않거나, 권한이 없거나, 사용자를 찾을 수 없는 경우
+     */
+    @Transactional
+    public PlanInviteResponse invitePlanCollaborator(Long planId, PlanInviteRequest request) {
+        User currentUser = getCurrentUser();
+        
+        // 계획 조회 및 소유자 확인
+        Plan plan = planRepository.findById(planId)
+            .orElseThrow(() -> new DomainException(PlanErrorCode.PLAN_NOT_FOUND));
+        
+        if (!plan.getOwner().getUserId().equals(currentUser.getUserId())) {
+            throw new DomainException(PlanErrorCode.ONLY_PLAN_OWNER_CAN_INVITE);
+        }
+        
+        // 초대할 사용자 조회
+        User invitedUser = userRepository.findByEmail(request.email())
+            .orElseThrow(() -> new DomainException(PlanErrorCode.USER_NOT_FOUND));
+        
+        // 이미 협력자인지 확인
+        if (planCollaboratorRepository.existsByPlanIdAndUserId(planId, invitedUser.getId())) {
+            throw new DomainException(PlanErrorCode.USER_ALREADY_INVITED);
+        }
+        
+        // 협력자 추가
+        planCollaboratorRepository.save(PlanCollaborator.builder()
+            .plan(plan)
+            .user(invitedUser)
+            .build());
+        
+        return PlanInviteResponse.builder()
+            .invitedUserEmail(invitedUser.getEmail())
+            .invitedUserName(invitedUser.getName())
+            .build();
+    }
 }
+

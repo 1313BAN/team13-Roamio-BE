@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import io.roam.common.entity.BaseTimeEntity;
 import io.roam.plan.type.PlaceType;
+import io.roam.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -41,6 +42,10 @@ public class PlanBlueprint extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_id")
     private Plan plan;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(columnDefinition = "SMALLINT UNSIGNED")
     private Integer day;

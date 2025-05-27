@@ -12,6 +12,7 @@ import lombok.Builder;
 public record PlanBlueprintWebSocketResponse(
     Long id,
     Long planId,
+    String userId,
     Integer day,
     BigDecimal position,
     String placeId,

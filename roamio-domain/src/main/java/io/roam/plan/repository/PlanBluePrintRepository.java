@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import io.roam.plan.entity.PlanBlueprint;
 
@@ -27,8 +28,20 @@ public interface PlanBlueprintRepository extends JpaRepository<PlanBlueprint, Lo
     @Query("""
         SELECT pb FROM PlanBlueprint pb
         JOIN FETCH pb.plan
+        JOIN FETCH pb.user
         WHERE pb.plan.id = :planId
         ORDER BY pb.day ASC, pb.position ASC
     """)
     List<PlanBlueprint> findByPlanIdOrderByDayAscPositionAsc(Long planId);
+
+    /**
+     * 특정 플랜의 블루프린트에서 최대 day 값을 조회합니다.
+     * @param planId 플랜 아이디
+     * @return 최대 day 값 (블루프린트가 없으면 null)
+     */
+    @Query("""
+        SELECT MAX(pb.day) FROM PlanBlueprint pb
+        WHERE pb.plan.id = :planId
+    """)
+    Integer findMaxDayByPlanId(@Param("planId") Long planId);
 }

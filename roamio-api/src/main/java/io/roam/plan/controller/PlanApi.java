@@ -5,10 +5,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import io.roam.common.response.ApiResponse;
 import io.roam.plan.dto.request.PlanBlueprintRequest;
 import io.roam.plan.dto.request.PlanCreateRequest;
+import io.roam.plan.dto.request.PlanInviteRequest;
 import io.roam.plan.dto.response.PlanBlueprintResponse;
 import io.roam.plan.dto.response.PlanBlueprintsResponse;
+import io.roam.plan.dto.response.PlanCollaboratorsResponse;
 import io.roam.plan.dto.response.PlanCreateResponse;
+import io.roam.plan.dto.response.PlanInviteResponse;
 import io.roam.plan.dto.response.PlanListResponse;
+import io.roam.plan.dto.response.PlanOwnerResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,4 +34,13 @@ public interface PlanApi {
 
     @Operation(summary = "계획 블루프린트 삭제", description = "계획 블루프린트를 삭제합니다.")
     public ApiResponse<Void> deletePlanBlueprint(@PathVariable Long planId, @PathVariable Long blueprintId);
+
+    @Operation(summary = "계획 소유자 조회", description = "계획의 소유자 정보를 조회합니다.")
+    public ApiResponse<PlanOwnerResponse> getPlanOwner(@PathVariable Long planId);
+
+    @Operation(summary = "계획 협력자 목록 조회", description = "계획의 협력자 목록을 조회합니다.")
+    public ApiResponse<PlanCollaboratorsResponse> getPlanCollaborators(@PathVariable Long planId);
+
+    @Operation(summary = "계획 협력자 초대", description = "계획에 협력자를 초대합니다.")
+    public ApiResponse<PlanInviteResponse> invitePlanCollaborator(@PathVariable Long planId, @RequestBody PlanInviteRequest request);
 }

@@ -1,5 +1,6 @@
 package io.roam.websocket.plan.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.Builder;
@@ -9,6 +10,8 @@ import lombok.Builder;
  */
 @Builder
 public record PlanBlueprintListResponse(
+    LocalDateTime startDate,
+    LocalDateTime endDate,
     List<PlanBlueprintWebSocketResponse> blueprints
 ) {
 } 

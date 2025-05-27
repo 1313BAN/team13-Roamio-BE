@@ -12,17 +12,24 @@ import io.roam.websocket.plan.dto.ConnectedUserResponse;
 import io.roam.websocket.plan.dto.ConnectedUsersListResponse;
 import io.roam.websocket.plan.dto.PlanBlueprintWebSocketResponse;
 import io.roam.websocket.plan.dto.PlanBlueprintListResponse;
+import io.roam.websocket.plan.dto.PlanChatResponse;
 import io.roam.websocket.plan.dto.PlanCursorResponse;
 import io.roam.websocket.plan.dto.PlanBlueprintListResponse;
+import io.roam.websocket.plan.dto.PlanDateUpdateResponse;
 import io.roam.websocket.plan.dto.request.PlanBlueprintRequest;
+import io.roam.websocket.plan.dto.request.PlanChatRequest;
+import io.roam.websocket.plan.dto.request.PlanDateUpdateRequest;
 import io.roam.websocket.plan.service.PlanSessionService;
 import io.roam.websocket.plan.service.PlanService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import io.roam.user.entity.User;
 import io.roam.websocket.plan.domain.CursorPos;
 import io.roam.websocket.plan.domain.Viewport;
 
@@ -40,6 +47,8 @@ public class PlanController {
             case POS -> sendPosition(session, planMessage.getPayload());
             case BLUEPRINT -> sendBlueprint(session, planMessage.getPayload());
             case REMOVE_BLUEPRINT -> sendRemoveBlueprint(session, planMessage.getPayload());
+            case UPDATE_DATE -> sendDateUpdate(session, planMessage.getPayload());
+            case SEND -> sendChatMessage(session, planMessage.getPayload());
             default -> log.info("Unknown message type: {}", planMessage.getType());
         }
     }
@@ -52,7 +61,8 @@ public class PlanController {
     private void sendBlueprint(WebSocketSession session, Object payload) {
         try {
             String planId = (String) session.getAttributes().get("planId");
-            
+            User user = (User) session.getAttributes().get("user");
+
             // payload를 PlanBlueprintRequest로 변환
             PlanBlueprintRequest request;
             if (payload instanceof String) {
@@ -62,7 +72,7 @@ public class PlanController {
             }
             
             // Blueprint 추가/수정 처리
-            PlanBlueprintWebSocketResponse response = planService.addOrUpdateBlueprint(Long.valueOf(planId), request);
+            PlanBlueprintWebSocketResponse response = planService.addOrUpdateBlueprint(Long.valueOf(planId), user, request);
             
             // 같은 플랜에 접속한 모든 사용자에게 Blueprint 변경사항 전송
             planSessionService.sendMessageToGroup(planId, 
@@ -144,6 +154,75 @@ public class PlanController {
                 session.getId(), response.blueprints().size());
         } catch (Exception e) {
             log.error("Error sending blueprint list: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 날짜 업데이트 요청을 처리합니다.
+     * @param session 웹소켓 세션
+     * @param payload 날짜 업데이트 요청 데이터
+     */
+    private void sendDateUpdate(WebSocketSession session, Object payload) {
+        try {
+            String planId = (String) session.getAttributes().get("planId");
+            
+            // payload를 PlanDateUpdateRequest로 변환
+            PlanDateUpdateRequest request;
+            if (payload instanceof String) {
+                request = objectMapper.readValue((String) payload, PlanDateUpdateRequest.class);
+            } else {
+                request = objectMapper.convertValue(payload, PlanDateUpdateRequest.class);
+            }
+            
+            // 날짜 업데이트 처리
+            PlanDateUpdateResponse response = planService.updatePlanDates(Long.valueOf(planId), request);
+            
+            // 같은 플랜에 접속한 모든 사용자에게 날짜 변경사항 전송
+            planSessionService.sendMessageToGroup(planId, 
+                PlanMessage.of(PlanMessageType.UPDATE_DATE, response));
+                
+            log.info("Date update {} for plan: {}, new dates: {} to {}", 
+                response.action(), planId, response.startDate(), response.endDate());
+        } catch (Exception e) {
+            log.error("Error processing date update request: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 채팅 메시지를 처리하고 브로드캐스트합니다.
+     * @param session 웹소켓 세션
+     * @param payload 채팅 메시지 데이터
+     */
+    private void sendChatMessage(WebSocketSession session, Object payload) {
+        try {
+            String planId = (String) session.getAttributes().get("planId");
+            User user = (User) session.getAttributes().get("user");
+            
+            // payload를 PlanChatRequest로 변환
+            PlanChatRequest request;
+            if (payload instanceof String) {
+                request = objectMapper.readValue((String) payload, PlanChatRequest.class);
+            } else {
+                request = objectMapper.convertValue(payload, PlanChatRequest.class);
+            }
+            
+            // 채팅 응답 생성
+            PlanChatResponse response = PlanChatResponse.builder()
+                .userId(user.getUserId())
+                .userName(user.getName())
+                .profileImageUrl(user.getProfileImageUrl())
+                .message(request.message())
+                .timestamp(LocalDateTime.now())
+                .build();
+            
+            // 같은 플랜에 접속한 모든 사용자에게 채팅 메시지 브로드캐스트
+            planSessionService.sendMessageToGroup(planId, 
+                PlanMessage.of(PlanMessageType.SEND, response));
+                
+            log.info("Chat message sent in plan: {}, from user: {}, message: {}", 
+                planId, user.getUserId(), request.message());
+        } catch (Exception e) {
+            log.error("Error processing chat message: {}", e.getMessage(), e);
         }
     }
 
