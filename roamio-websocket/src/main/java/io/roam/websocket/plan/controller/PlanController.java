@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
 import io.roam.websocket.plan.domain.CursorPos;
+import io.roam.websocket.plan.domain.Viewport;
 
 @Slf4j
 @Controller
@@ -151,30 +152,35 @@ public class PlanController {
             String planId = (String) session.getAttributes().get("planId");
             
             List<CursorPos> cursorPositions = new ArrayList<>();
+            Viewport viewport = null;
             
-            // payload가 직접 [[x1, y1], [x2, y2]] 형태로 전송된 데이터 처리
-            if (payload instanceof List) {
-                List<List<Integer>> positions = (List<List<Integer>>) payload;
-                log.info("Cursor type 1");
-                for (List<Integer> pos : positions) {
-                    if (pos.size() >= 2) {
-                        cursorPositions.add(CursorPos.builder()
-                            .x(pos.get(0))
-                            .y(pos.get(1))
-                            .build());
+            // 새로운 구조: payload가 Map 형태로 pos와 viewport를 포함
+            if (payload instanceof Map) {
+                Map<String, Object> payloadMap = (Map<String, Object>) payload;
+                
+                // pos 데이터 처리
+                Object posData = payloadMap.get("pos");
+                if (posData instanceof List) {
+                    List<List<Integer>> positions = (List<List<Integer>>) posData;
+                    for (List<Integer> pos : positions) {
+                        if (pos.size() >= 2) {
+                            cursorPositions.add(CursorPos.builder()
+                                .x(pos.get(0))
+                                .y(pos.get(1))
+                                .build());
+                        }
                     }
                 }
-            } else if (payload instanceof String) {
-                // 문자열 형태로 전송된 경우 ObjectMapper로 파싱
-                List<List<Integer>> positions = objectMapper.readValue((String) payload, new TypeReference<List<List<Integer>>>() {});
-                log.info("Cursor type 2");
-                for (List<Integer> pos : positions) {
-                    if (pos.size() >= 2) {
-                        cursorPositions.add(CursorPos.builder()
-                            .x(pos.get(0))
-                            .y(pos.get(1))
-                            .build());
-                    }
+                
+                // viewport 데이터 처리
+                Object viewportData = payloadMap.get("viewport");
+                if (viewportData instanceof Map) {
+                    Map<String, Object> viewportMap = (Map<String, Object>) viewportData;
+                    viewport = Viewport.builder()
+                        .lat(((Number) viewportMap.get("lat")).doubleValue())
+                        .lng(((Number) viewportMap.get("lng")).doubleValue())
+                        .zoom(((Number) viewportMap.get("zoom")).intValue())
+                        .build();
                 }
             }
             
@@ -182,6 +188,7 @@ public class PlanController {
                 .userId((String) session.getAttributes().get("userId"))
                 .name((String) session.getAttributes().get("name"))
                 .positions(cursorPositions)
+                .viewport(viewport)
                 .build();
                 
             planSessionService.sendMessageToGroup(planId, PlanMessage.of(PlanMessageType.POS, planCursorResponse));
