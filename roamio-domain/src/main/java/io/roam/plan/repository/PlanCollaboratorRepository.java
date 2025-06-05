@@ -29,7 +29,8 @@ public interface PlanCollaboratorRepository extends JpaRepository<PlanCollaborat
     List<PlanCollaborator> findWithPlanAndOwnerByUserId(@Param("userId") Long userId);
 
     @Query("""
-        SELECT  pc.user.userId as userId,
+        SELECT  pc.plan.id as planId,
+                pc.user.userId as userId,
                 pc.user.email as email,
                 pc.user.name as userName,
                 pc.user.profileImageUrl as profileImageUrl
@@ -37,4 +38,15 @@ public interface PlanCollaboratorRepository extends JpaRepository<PlanCollaborat
         WHERE pc.plan.id = :planId
     """)
     List<PlanCollaboratorInfo> getCollaboratorListByPlanId(@Param("planId") Long planId);
+
+    @Query("""
+        SELECT  pc.plan.id as planId,
+                pc.user.userId as userId,
+                pc.user.email as email,
+                pc.user.name as userName,
+                pc.user.profileImageUrl as profileImageUrl
+        FROM PlanCollaborator pc
+        WHERE pc.plan.id IN :planIds
+    """)
+    List<PlanCollaboratorInfo> getCollaboratorListByPlanIds(@Param("planIds") List<Long> planIds);
 }

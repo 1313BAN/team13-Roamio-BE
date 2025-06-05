@@ -2,6 +2,7 @@ package io.roam.plan.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -59,7 +60,18 @@ public class PlanService {
     public PlanListResponse getPlanList() {
         User user = getCurrentUser();
 
-        List<PlanResponse> plans = planCollaboratorRepository.findWithPlanAndOwnerByUserId(user.getId()).stream()
+        List<PlanCollaborator> userPlans = planCollaboratorRepository.findWithPlanAndOwnerByUserId(user.getId());
+        List<Long> planIds = userPlans.stream()
+            .map(PlanCollaborator::getPlan)
+            .map(Plan::getId)
+            .toList();
+
+        // 모든 협력자 정보를 한 번에 조회
+        Map<Long, List<PlanCollaboratorInfo>> collaboratorsByPlanId = 
+            planCollaboratorRepository.getCollaboratorListByPlanIds(planIds).stream()
+                .collect(Collectors.groupingBy(PlanCollaboratorInfo::getPlanId));
+        
+        List<PlanResponse> plans = userPlans.stream()
             .map(PlanCollaborator::getPlan)
             .map(plan -> PlanResponse.builder()
                 .id(plan.getId())
@@ -69,7 +81,7 @@ public class PlanService {
                 .description(plan.getDescription())
                 .startDate(plan.getStartDate())
                 .endDate(plan.getEndDate())
-                .collaborators(planCollaboratorRepository.getCollaboratorListByPlanId(plan.getId()))
+                .collaborators(collaboratorsByPlanId.getOrDefault(plan.getId(), List.of()))
                 .build())
             .toList();
 
