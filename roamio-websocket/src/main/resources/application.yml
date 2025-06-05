@@ -1,10 +1,10 @@
 server:
     address: ${API_SERVER_ADDR}
-    port: ${API_SERVER_PORT}
+    port: 8081
 
 spring:
     application:
-        name: roamio
+        name: roamio-websocket
 
     config:
         import: optional:file:.env[.properties]

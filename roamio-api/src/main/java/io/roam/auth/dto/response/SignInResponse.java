@@ -5,6 +5,7 @@ import lombok.Builder;
 
 @Builder
 public record SignInResponse(
+    String userId,
     String name,
     String email,
     JwtToken token

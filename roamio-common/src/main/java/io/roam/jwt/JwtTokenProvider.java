@@ -26,7 +26,8 @@ public class JwtTokenProvider {
     private static final String BEARER_PREFIX = "Bearer ";
 
     // 클레임 관련 상수
-    private static final String CLIENT_ID_CLAIM = "clientId";
+    private static final String USER_ID_CLAIM = "userId";
+    private static final String USER_NAME_CLAIM = "name";
     private static final String SOCIAL_TYPE_CLAIM = "socialType";
     private static final String ROLE_CLAIM = "role";
 
@@ -37,7 +38,8 @@ public class JwtTokenProvider {
     public String generateToken(JwtPayload payload, Long expirationTime) {
         // 사용자 정보 클레임 생성
         Map<String, Object> claims = Map.of(
-            CLIENT_ID_CLAIM, payload.clientId(),
+            USER_ID_CLAIM, payload.userId(),
+            USER_NAME_CLAIM, payload.name(),
             SOCIAL_TYPE_CLAIM, payload.socialType(),
             ROLE_CLAIM, payload.role()
         );
@@ -74,16 +76,16 @@ public class JwtTokenProvider {
     /**
      * 토큰에서 클라이언트 아이디 정보를 추출합니다.
      */
-    public String getClientId(String token) {
+    public String getUserId(String token) {
         Claims claims = getClaims(token);
-        return claims != null ? getClientId(claims) : null;
+        return claims != null ? getUserId(claims) : null;
     }
 
     /**
      * Claims에서 클라이언트 아이디 정보를 추출합니다.
      */
-    public String getClientId(Claims claims) {
-        return claims.get(CLIENT_ID_CLAIM, String.class);
+    public String getUserId(Claims claims) {
+        return claims.get(USER_ID_CLAIM, String.class);
     }
     
     /**
@@ -115,6 +117,22 @@ public class JwtTokenProvider {
     public String getRole(Claims claims) {
         return claims.get(ROLE_CLAIM, String.class);
     }
+
+    /**
+     * 토큰에서 클라이언트 이름 정보를 추출합니다.
+     */
+    public String getName(String token) {
+        Claims claims = getClaims(token);
+        return claims != null ? getName(claims) : null;
+    }
+
+    /**
+     * Claims에서 클라이언트 이름 정보를 추출합니다.
+     */
+    public String getName(Claims claims) {
+        return claims.get(USER_NAME_CLAIM, String.class);
+    }
+
 
     /**
      * 토큰에서 Claims 정보를 추출합니다.

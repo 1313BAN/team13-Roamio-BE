@@ -42,10 +42,12 @@ public class AuthService {
         }
 
         return SignInResponse.builder()
+                .userId(user.getUserId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .token(jwtService.issueToken(JwtPayload.builder()
-                    .clientId(user.getUserId())
+                    .userId(user.getUserId())
+                    .name(user.getName())
                     .socialType(user.getSocialType())
                     .role(user.getUserRole())
                     .build()))
@@ -106,10 +108,12 @@ public class AuthService {
         log.trace("Social User: {}", user);
 
         return SignInResponse.builder()
+                .userId(user.getUserId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .token(jwtService.issueToken(JwtPayload.builder()
-                    .clientId(user.getUserId())
+                    .userId(user.getUserId())
+                    .name(user.getName())
                     .socialType(user.getSocialType())
                     .role(user.getUserRole())
                     .build()))
