@@ -1,7 +1,7 @@
 package io.roam.plan.type;
 
 public enum PlaceType {
-    ACCOMODATION,
+    ACCOMMODATION,
     RESTAURANT,
     CAFE,
     OTHER;
